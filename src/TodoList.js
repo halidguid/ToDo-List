@@ -16,18 +16,10 @@ class TodoList extends Component {
     }
 
     componentDidMount() {
-        const items = [];
-
-        for (let [key, value] of Object.entries(localStorage)) {
-            var item = {
-                text: value,
-                key: key
-            };
-            items.push(item);
-        }
+        var items = JSON.parse(localStorage.getItem("todos") || "[]");
+          
         this.setState({items});
     }
-    
 
     addItem(e) {
         if (this._inputElement.value !== "") {
@@ -36,14 +28,18 @@ class TodoList extends Component {
                 key: Date.now()
             };
 
-            localStorage.setItem(newItem.key, newItem.text);
-           this.setState({
-               items: [newItem, ...this.state.items]
-           })
-
-        }
-
-        this._inputElement.value = "";
+            this.setState({
+                items: [newItem, ...this.state.items]
+            }, () => {
+ 
+             localStorage.setItem("todos", JSON.stringify(this.state.items));
+            })
+         
+           
+       
+         }
+ 
+         this._inputElement.value = "";
 
         
 
@@ -58,6 +54,7 @@ class TodoList extends Component {
             return (item.key !== key)
         });
 
+        localStorage.setItem("todos", JSON.stringify(filteredItems));
         this.setState({
             items: filteredItems
         });
@@ -70,7 +67,7 @@ class TodoList extends Component {
                 <div className="header">
                     <form onSubmit={this.addItem}>
                         <input ref={(a) => this._inputElement = a}
-                            placeholder="enter task">
+                            placeholder="enter task" required>
 
                         </input>
                         <button type="submit">add</button>
